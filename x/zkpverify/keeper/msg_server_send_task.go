@@ -2,7 +2,7 @@ package keeper
 
 import (
 	"context"
-	"encoding/hex"
+	"encoding/base64"
 	"strconv"
 
 	"fiamma/x/zkpverify/types"
@@ -18,11 +18,28 @@ func (k msgServer) SendTask(goCtx context.Context, msg *types.MsgSendTask) (*typ
 		return nil, types.ErrInvalidProofSystem
 
 	}
+
+	proofBuffer, err := base64.StdEncoding.DecodeString(msg.Proof)
+	if err != nil {
+		return nil, types.ErrDecodeProof
+	}
+
+	publicInputBuffer, err := base64.StdEncoding.DecodeString(msg.PublicInput)
+	if err != nil {
+		return nil, types.ErrDecodeProof
+	}
+
+	verifyKey, err := base64.StdEncoding.DecodeString(msg.Vk)
+	if err != nil {
+		return nil, types.ErrDecodeProof
+
+	}
+
 	verfiyData := types.VerifyData{
 		ProofSystem: uint64(proofSystemId),
-		Proof:       msg.Proof,
-		PublicInput: msg.PublicInput,
-		Vk:          msg.Vk,
+		Proof:       proofBuffer,
+		PublicInput: publicInputBuffer,
+		Vk:          verifyKey,
 	}
 	// submit proof data to DA
 	verifyId, dataCommitments, err := k.SubmitVerifyDataToDA(ctx, verfiyData)
@@ -31,8 +48,8 @@ func (k msgServer) SendTask(goCtx context.Context, msg *types.MsgSendTask) (*typ
 		return nil, types.ErrSubmitProof
 	}
 
-	verifyIdStr := hex.EncodeToString(verifyId[:])
-	dataCommitmentStr := hex.EncodeToString(dataCommitments[0])
+	verifyIdStr := base64.StdEncoding.EncodeToString(verifyId[:])
+	dataCommitmentStr := base64.StdEncoding.EncodeToString(dataCommitments[0])
 
 	// The chain first verifies the correctness of the proofs submitted by the user, and saves the results.
 	// The observer may challenge the result at a later stage.
@@ -47,7 +64,7 @@ func (k msgServer) SendTask(goCtx context.Context, msg *types.MsgSendTask) (*typ
 		Result:         result,
 	}
 
-	k.SetVerifyData(ctx, verifyId[:], verifyResult)
+	k.SetVerifyResult(ctx, verifyId[:], verifyResult)
 
 	event := sdk.NewEvent("verifyFinished",
 		sdk.NewAttribute("verifyId", verifyIdStr),

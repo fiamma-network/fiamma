@@ -8,9 +8,9 @@ PROOF_SYSTEM ?= PlonkBn254
 PROVER ?= gnark_plonk.go
 DIR = ./example/
 
-PROOF_FILE ?= $(DIR)/proof
-PUBLIC_INPUTS_FILE ?= $(DIR)/public_input
-VERIFYING_KEY_FILE ?= $(DIR)/vk
+PROOF_FILE ?= $(DIR)/proof.base64
+PUBLIC_INPUTS_FILE ?= $(DIR)/public_input.base64
+VERIFYING_KEY_FILE ?= $(DIR)/vk.base64
 
 prove: | generate-proof send-proof clean
 

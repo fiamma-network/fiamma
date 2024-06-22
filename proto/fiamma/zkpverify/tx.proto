@@ -44,9 +44,9 @@ message MsgSendTask {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1;
   string proofSystem = 2;
-  bytes proof = 3;
-  bytes publicInput = 4;
-  bytes vk = 5;
+  string proof = 3;
+  string publicInput = 4;
+  string vk = 5;
 }
 
 message MsgSendTaskResponse {}

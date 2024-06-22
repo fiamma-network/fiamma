@@ -9,9 +9,8 @@ import (
 )
 
 type Config struct {
-	RpcURL    string `json:"rpcURL"`
-	Namespace string `json:"modularAppName"`
-	AuthKey   string `json:"authKey"`
+	RpcURL  string `json:"rpcURL"`
+	AuthKey string `json:"authKey"`
 }
 
 func (c *Config) GetConfig(configFileName string, logger log.Logger) error {
